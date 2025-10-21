@@ -33,9 +33,11 @@ export async function getAllSeasons(
   titleId: string,
   totalSeasons: number
 ): Promise<EpisodeWithScore[]> {
-  const storage = localStorage.getItem(titleId)
-  if (storage) {
-    return JSON.parse(storage)
+  if (typeof window !== "undefined") {
+    const storage = localStorage.getItem(titleId)
+    if (storage) {
+      return JSON.parse(storage)
+    }
   }
 
   const allEpisodes: EpisodeWithScore[] = []
@@ -52,7 +54,9 @@ export async function getAllSeasons(
     }
   }
 
-  localStorage.setItem(titleId, JSON.stringify(allEpisodes))
+  if (typeof window !== "undefined") {
+    localStorage.setItem(titleId, JSON.stringify(allEpisodes))
+  }
   return allEpisodes
 }
 
@@ -74,9 +78,11 @@ export async function getSeasonsWithScores(
   totalSeasons: number
 ): Promise<SeasonWithScore[]> {
   const cacheKey = `${titleId}_seasons`
-  const storage = localStorage.getItem(cacheKey)
-  if (storage) {
-    return JSON.parse(storage)
+  if (typeof window !== "undefined") {
+    const storage = localStorage.getItem(cacheKey)
+    if (storage) {
+      return JSON.parse(storage)
+    }
   }
 
   const seasonsWithScores: SeasonWithScore[] = []
@@ -102,6 +108,8 @@ export async function getSeasonsWithScores(
 
   const sorted = seasonsWithScores.sort((a, b) => b.medianScore - a.medianScore)
 
-  localStorage.setItem(cacheKey, JSON.stringify(sorted))
+  if (typeof window !== "undefined") {
+    localStorage.setItem(cacheKey, JSON.stringify(sorted))
+  }
   return sorted
 }

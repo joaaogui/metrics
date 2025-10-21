@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
@@ -88,7 +88,7 @@ const columns: ColumnDef<Video>[] = [
   },
 ]
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { channelInfo, videos, setChannelInfo, setVideos } =
@@ -110,7 +110,7 @@ export default function HomePage() {
       setSearchInput(query)
       searchMutation.mutate(query)
     }
-  }, [searchParams])
+  }, [searchParams, searchInput, searchMutation])
 
   const handleSearch = () => {
     if (searchInput.trim()) {
@@ -165,5 +165,13 @@ export default function HomePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
   )
 }

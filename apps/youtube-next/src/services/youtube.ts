@@ -30,14 +30,20 @@ async function getVideo(videoId: string) {
 }
 
 async function getVideoInfo(videoId: string, attribute: string) {
-  const storage = localStorage.getItem(videoId)
   let statistics
 
-  if (storage) {
-    statistics = JSON.parse(storage)
-  } else {
-    const video = await getVideo(videoId)
-    statistics = video.data.items[0].statistics
+  if (typeof window !== "undefined") {
+    const storage = localStorage.getItem(videoId)
+    if (storage) {
+      statistics = JSON.parse(storage)
+      return Number(statistics[attribute])
+    }
+  }
+
+  const video = await getVideo(videoId)
+  statistics = video.data.items[0].statistics
+  
+  if (typeof window !== "undefined") {
     localStorage.setItem(videoId, JSON.stringify(statistics))
   }
 
@@ -68,9 +74,11 @@ export async function searchChannel(name: string): Promise<ChannelInfo> {
 }
 
 export async function getChannelVideos(channelId: string): Promise<Video[]> {
-  const storage = localStorage.getItem(channelId)
-  if (storage) {
-    return JSON.parse(storage)
+  if (typeof window !== "undefined") {
+    const storage = localStorage.getItem(channelId)
+    if (storage) {
+      return JSON.parse(storage)
+    }
   }
 
   const channelUrl = `${API_URL}/channels?part=contentDetails&id=${channelId}&key=${API_KEY}`
@@ -106,6 +114,8 @@ export async function getChannelVideos(channelId: string): Promise<Video[]> {
     })
   }
 
-  localStorage.setItem(channelId, JSON.stringify(videos))
+  if (typeof window !== "undefined") {
+    localStorage.setItem(channelId, JSON.stringify(videos))
+  }
   return videos
 }

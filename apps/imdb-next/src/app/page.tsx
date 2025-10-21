@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
@@ -37,7 +37,7 @@ const columns: ColumnDef<SeasonWithScore>[] = [
   },
 ]
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { titleInfo, seasons, setTitleInfo, setSeasons } = useImdbStore()
@@ -65,7 +65,7 @@ export default function Home() {
       setSearchInput(query)
       searchMutation.mutate(query)
     }
-  }, [searchParams])
+  }, [searchParams, searchInput, searchMutation])
 
   const handleSearch = () => {
     if (searchInput.trim()) {
@@ -130,5 +130,13 @@ export default function Home() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   )
 }

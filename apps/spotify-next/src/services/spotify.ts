@@ -138,9 +138,11 @@ export async function getTrackDetails(trackIds: string[]): Promise<Track[]> {
 export async function getArtistAlbumsWithTracks(
   artistName: string
 ): Promise<AlbumWithTracks[]> {
-  const storage = localStorage.getItem(artistName)
-  if (storage) {
-    return JSON.parse(storage)
+  if (typeof window !== "undefined") {
+    const storage = localStorage.getItem(artistName)
+    if (storage) {
+      return JSON.parse(storage)
+    }
   }
 
   const artist = await searchArtist(artistName)
@@ -164,6 +166,8 @@ export async function getArtistAlbumsWithTracks(
     }
   })
 
-  localStorage.setItem(artistName, JSON.stringify(albumsWithTracks))
+  if (typeof window !== "undefined") {
+    localStorage.setItem(artistName, JSON.stringify(albumsWithTracks))
+  }
   return albumsWithTracks
 }
